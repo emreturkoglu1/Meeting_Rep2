@@ -245,6 +245,37 @@ def create_pdf_from_markdown(markdown_path, pdf_path):
 
 # Fallback rapor oluşturma fonksiyonu
 def create_fallback_report():
+    # Duygu analizi verilerini oku
+    emotion_data = {"neutral": 0, "happy": 0, "sad": 0, "surprised": 0, "angry": 0}
+    total_emotions = 0
+    csv_path = os.path.join('custom_output', 'emotion_analysis.csv')
+
+    try:
+        if os.path.exists(csv_path):
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                # Header satırını atla
+                next(f)
+                for line in f:
+                    if line.strip():
+                        fields = line.strip().split(',')
+                        if len(fields) >= 4:
+                            emotion = fields[3].lower()
+                            if emotion in emotion_data:
+                                emotion_data[emotion] += 1
+                                total_emotions += 1
+            
+            print(f"✅ Emotion analysis data loaded for fallback report: {emotion_data}")
+    except Exception as e:
+        print(f"❌ Error reading emotion data for fallback report: {str(e)}")
+
+    # Duygu dağılımını hesapla
+    emotion_section = ""
+    if total_emotions > 0:
+        emotion_section = "## Facial Expression Analysis\n\n### Emotion Distribution\n"
+        for emotion, count in emotion_data.items():
+            percentage = (count / total_emotions) * 100
+            emotion_section += f"- **{emotion.capitalize()}**: {percentage:.1f}%\n"
+    
     # Basit bir rapor oluştur
     fallback_report = """<style>
 body {
@@ -301,6 +332,21 @@ color: #f39c12;
 .priority-low {
 color: #27ae60;
 }
+.emotion-neutral {
+color: #7f8c8d;
+}
+.emotion-happy {
+color: #2ecc71;
+}
+.emotion-sad {
+color: #3498db;
+}
+.emotion-surprised {
+color: #9b59b6;
+}
+.emotion-angry {
+color: #e74c3c;
+}
 hr {
 border: 0;
 height: 1px;
@@ -321,6 +367,10 @@ This meeting report was automatically generated from the uploaded meeting record
 ## Transcript Summary
 The full transcript is available in the transcript.txt file.
 """
+    
+    # Duygu analizini fallback rapora ekle
+    if emotion_section:
+        fallback_report += "\n\n" + emotion_section
     
     # Raporu kaydet
     markdown_path = os.path.join('custom_output', 'meeting_report.md')
@@ -345,6 +395,39 @@ try:
             transcript = f.read()
 except Exception:
     pass
+
+# Duygu analizi verilerini oku ve işle
+emotion_data = {"neutral": 0, "happy": 0, "sad": 0, "surprised": 0, "angry": 0}
+total_emotions = 0
+csv_path = os.path.join('custom_output', 'emotion_analysis.csv')
+
+try:
+    if os.path.exists(csv_path):
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            # Header satırını atla
+            next(f)
+            for line in f:
+                if line.strip():
+                    fields = line.strip().split(',')
+                    if len(fields) >= 4:
+                        emotion = fields[3].lower()
+                        if emotion in emotion_data:
+                            emotion_data[emotion] += 1
+                            total_emotions += 1
+        
+        print(f"✅ Emotion analysis data loaded successfully: {emotion_data}")
+except Exception as e:
+    print(f"❌ Error reading emotion data: {str(e)}")
+
+# Duygu dağılımını hesapla
+emotion_distribution = ""
+if total_emotions > 0:
+    emotion_distribution = "### Emotion Distribution\n"
+    for emotion, count in emotion_data.items():
+        percentage = (count / total_emotions) * 100
+        emotion_distribution += f"- **{emotion.capitalize()}**: {percentage:.1f}%\n"
+else:
+    emotion_distribution = "### Emotion Distribution\nNo emotion data available."
 
 # Define your prompt as a single string
 prompt = f"""
@@ -387,9 +470,7 @@ Do not include any introductory text or additional explanations.
 - [Follow-up 2]
 
 ## Facial Expression Analysis
-### Overall Emotion Distribution
-[Calculate and report the percentage distribution of different emotions detected during the meeting]
-[Identify and highlight the most prevalent emotions]
+{emotion_distribution}
 
 ## Key Insights & Recommendations
 [Provide 2-3 paragraphs of analysis and recommendations based on the meeting content]
