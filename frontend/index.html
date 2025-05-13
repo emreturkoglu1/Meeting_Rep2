@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Processor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Video Processor</h1>
+            <p class="subtitle">Upload your video to extract audio and video separately</p>
+        </div>
+
+        <div class="upload-container" id="upload-container">
+            <div class="email-input-container">
+                <label for="email-input">Please provide your email address to receive the meeting report:</label>
+                <input type="email" id="email-input" placeholder="Your email address" required>
+            </div>
+
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <p class="upload-text">Drag & Drop your video here</p>
+                <p class="upload-subtext">or</p>
+                <button class="browse-btn">Browse Files</button>
+                <input type="file" id="file-input" style="display: none;">
+            </div>
+
+            <div id="file-info" class="file-info"></div>
+
+            <button id="approve-btn" class="approve-btn" disabled>
+                <i class="fas fa-check"></i>
+                Process Video
+            </button>
+        </div>
+
+        <div id="loading-spinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+            <div class="progress-list"></div>
+            <div class="realtime-analysis" id="realtime-analysis" style="display: none; margin-top: 20px;">
+                <h3>Yüz Analizi İşlemi</h3>
+                <div class="emotion-grid">
+                    <div class="emotion-item">
+                        <span class="emotion-label neutral">😐 Neutral</span>
+                        <div class="progress-bar">
+                            <div class="progress" id="live-neutral-progress" style="width: 0%;"></div>
+                        </div>
+                        <span class="percentage" id="live-neutral-percentage">0%</span>
+                    </div>
+                    <div class="emotion-item">
+                        <span class="emotion-label happy">😀 Happy</span>
+                        <div class="progress-bar">
+                            <div class="progress" id="live-happy-progress" style="width: 0%;"></div>
+                        </div>
+                        <span class="percentage" id="live-happy-percentage">0%</span>
+                    </div>
+                    <div class="emotion-item">
+                        <span class="emotion-label sad">😔 Sad</span>
+                        <div class="progress-bar">
+                            <div class="progress" id="live-sad-progress" style="width: 0%;"></div>
+                        </div>
+                        <span class="percentage" id="live-sad-percentage">0%</span>
+                    </div>
+                    <div class="emotion-item">
+                        <span class="emotion-label surprised">😲 Surprised</span>
+                        <div class="progress-bar">
+                            <div class="progress" id="live-surprised-progress" style="width: 0%;"></div>
+                        </div>
+                        <span class="percentage" id="live-surprised-percentage">0%</span>
+                    </div>
+                    <div class="emotion-item">
+                        <span class="emotion-label angry">😠 Angry</span>
+                        <div class="progress-bar">
+                            <div class="progress" id="live-angry-progress" style="width: 0%;"></div>
+                        </div>
+                        <span class="percentage" id="live-angry-percentage">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="face-analysis-container" class="face-analysis-container" style="display: none;">
+            <h2>Facial Expression Analysis</h2>
+            <div class="analysis-content">
+                <div class="analysis-results" style="width: 100%;">
+                    <h3>Detected Emotions</h3>
+                    <div class="emotion-distribution">
+                        <div class="emotion-item">
+                            <span class="emotion-label neutral">Neutral</span>
+                            <div class="progress-bar">
+                                <div class="progress" id="neutral-progress" style="width: 0%;"></div>
+                            </div>
+                            <span class="percentage" id="neutral-percentage">0%</span>
+                        </div>
+                        <div class="emotion-item">
+                            <span class="emotion-label happy">Happy</span>
+                            <div class="progress-bar">
+                                <div class="progress" id="happy-progress" style="width: 0%;"></div>
+                            </div>
+                            <span class="percentage" id="happy-percentage">0%</span>
+                        </div>
+                        <div class="emotion-item">
+                            <span class="emotion-label sad">Sad</span>
+                            <div class="progress-bar">
+                                <div class="progress" id="sad-progress" style="width: 0%;"></div>
+                            </div>
+                            <span class="percentage" id="sad-percentage">0%</span>
+                        </div>
+                        <div class="emotion-item">
+                            <span class="emotion-label surprised">Surprised</span>
+                            <div class="progress-bar">
+                                <div class="progress" id="surprised-progress" style="width: 0%;"></div>
+                            </div>
+                            <span class="percentage" id="surprised-percentage">0%</span>
+                        </div>
+                        <div class="emotion-item">
+                            <span class="emotion-label angry">Angry</span>
+                            <div class="progress-bar">
+                                <div class="progress" id="angry-progress" style="width: 0%;"></div>
+                            </div>
+                            <span class="percentage" id="angry-percentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="download-container" class="download-container" style="display: none;">
+            <button id="download-btn" class="download-btn">
+                <i class="fas fa-download"></i>
+                Download Report
+            </button>
+        </div>
+
+        <div id="processed-files" class="processed-files" style="display: none;">
+            <h2>Processed Files</h2>
+            <div class="files-grid">
+                <div class="file-card">
+                    <div class="file-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="file-details">
+                        <h3>Video File</h3>
+                        <p class="file-format">MP4 Format</p>
+                    </div>
+                    <a id="video-download" class="download-btn" download>
+                        <i class="fas fa-download"></i>
+                        Download
+                    </a>
+                </div>
+                <div class="file-card">
+                    <div class="file-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="file-details">
+                        <h3>Audio File</h3>
+                        <p class="file-format">MP3 Format</p>
+                    </div>
+                    <a id="audio-download" class="download-btn" download>
+                        <i class="fas fa-download"></i>
+                        Download
+                    </a>
+                </div>
+                <div class="file-card">
+                    <div class="file-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="file-details">
+                        <h3>Emotion Analysis</h3>
+                        <p class="file-format">CSV Format</p>
+                    </div>
+                    <a id="emotion-download" class="download-btn" download>
+                        <i class="fas fa-download"></i>
+                        Download
+                    </a>
+                </div>
+            </div>
+            <button id="new-video-btn" class="new-video-btn">
+                <i class="fas fa-plus"></i>
+                Process Another Video
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

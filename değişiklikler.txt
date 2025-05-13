@@ -1,0 +1,129 @@
+# Yapılan Tüm Değişiklikler
+
+## 1. Ses Diyarizasyon (Konuşmacı Ayrıştırma) Sorunu Çözümü:
+
+Sorun: `Sizes of tensors must match except in dimension 0. Expected size 80000 but got size 78717 for tensor number 5 in the list.` hatası alındı.
+
+Çözüm:
+- `audio_diarization/whisper_diarization.py` dosyasına ses dosyası normalleştirme fonksiyonu eklendi.
+- Ses dosyasını diyarizasyon işleminden önce 16kHz mono WAV formatına dönüştürmek için ön işleme adımı eklendi.
+- Ses işleme kütüphaneleri (numpy, torch, soundfile) import edildi.
+
+```python
+# Eklenen fonksiyon:
+def normalize_audio(audio_file_path: str) -> str:
+    """Ses dosyasını standart formatta normalleştirir (16kHz, mono)"""
+    temp_dir = tempfile.gettempdir()
+    normalized_path = os.path.join(temp_dir, "normalized_audio.wav")
+    
+    try:
+        (
+            ffmpeg
+            .input(audio_file_path)
+            .output(normalized_path, acodec='pcm_s16le', ac=1, ar=16000)
+            .overwrite_output()
+            .run(quiet=True)
+        )
+        print(f"✅ Audio normalized to 16kHz mono format")
+        return normalized_path
+    except Exception as e:
+        print(f"❌ Error normalizing audio: {str(e)}")
+        return audio_file_path
+```
+
+## 2. E-posta Karakter Kodlama Sorunu Çözümü:
+
+Sorun: `'charmap' codec can't encode character '\U0001f4cb' in position 2: character maps to <undefined>` hatası alındı.
+
+Çözüm:
+- `email_service/email_bot.py` dosyasına emoji temizleme fonksiyonu eklendi.
+- E-posta içeriğinde UTF-8 karakter kodlaması açıkça belirtildi.
+- Konu ve içerik metinlerinden emojiler otomatik olarak temizlendi.
+
+```python
+# Eklenen fonksiyon:
+def remove_emojis(text):
+    """Metinden emoji karakterlerini temizler"""
+    if text is None:
+        return ""
+    emoji_pattern = re.compile(
+        "["
+        "\U0001F600-\U0001F64F"  # emoticons
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F680-\U0001F6FF"  # transport & map symbols
+        "\U0001F700-\U0001F77F"  # alchemical symbols
+        "\U0001F780-\U0001F7FF"  # Geometric Shapes
+        "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+        "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+        "\U0001FA00-\U0001FA6F"  # Chess Symbols
+        "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+        "\U00002702-\U000027B0"  # Dingbats
+        "\U000024C2-\U0001F251" 
+        "]+"
+    )
+    return emoji_pattern.sub(r'', text)
+```
+
+## 3. Markdown'dan PDF Oluşturma Sorunu Çözümü:
+
+Sorun: `npm install -g markdown-pdf` kurulmasına rağmen komut bulunamadı.
+
+Çözüm:
+- PDF oluşturmak için alternatif yaklaşımlar eklendi.
+- Üç farklı yöntem deneniyor: markdown-pdf, npm exec ve son çare olarak reportlab.
+- Tüm yöntemler başarısız olursa, markdown dosyasını olduğu gibi e-posta eki olarak kullanıyor.
+
+```python
+# Alternatif PDF oluşturma yaklaşımları:
+# 1. Standart markdown-pdf komutu
+try:
+    subprocess.run(['markdown-pdf', markdown_path, '-o', pdf_path], check=True)
+    pdf_generated = True
+except:
+    # 2. npm exec yöntemi
+    try:
+        npm_path = "C:\\Program Files\\nodejs\\npm.cmd"  # Windows varsayılan yolu
+        if not os.path.exists(npm_path):
+            npm_path = subprocess.check_output(["where", "npm"], text=True).strip()
+        subprocess.run([npm_path, "exec", "markdown-pdf", markdown_path, "-o", pdf_path], check=True)
+        pdf_generated = True
+    except:
+        # 3. Python reportlab kütüphanesi kullanımı
+        try:
+            # reportlab kullanarak markdown içeriğinden basit PDF oluşturma
+            # ...
+        except:
+            # Son çare: markdown dosyasını kullan
+            pdf_path = markdown_path
+```
+
+## 4. Gemini API Rapor Şablonundan Emoji Temizleme:
+
+Sorun: Windows karakter kodlama sorunları nedeniyle emoji içeren raporlar hata veriyor.
+
+Çözüm:
+- `geminiapi.py` dosyasındaki markdown şablonundan tüm emoji karakterleri kaldırıldı.
+- Gemini'den gelen raporun temizlenmesi için emoji temizleme fonksiyonu eklendi.
+- Dosya yazarken UTF-8 kodlaması açıkça belirtildi.
+
+```python
+# Markdown dosyasına yazarken UTF-8 kodlaması kullanma:
+with open(report_path, 'w', encoding='utf-8') as f:
+    f.write(report)
+```
+
+## 5. Parser.py'daki Emoji Kullanımının Kaldırılması:
+
+Sorun: Log mesajlarında emoji kullanımı karakter kodlama sorunlarına yol açıyor.
+
+Çözüm:
+- Log mesajlarındaki emojiler düz metinle değiştirildi.
+- Dosyalara yazarken UTF-8 kodlaması açıkça belirtildi.
+
+```python
+# Emoji yerine düz metin:
+print("\nPreparing email with meeting report...")  # Önceden: print("\n📧 Preparing email with meeting report...")
+print(f"Found {len(diarization_results)} speech segments")  # Önceden: print(f"📝 Found {len(diarization_results)} speech segments")
+```
+
+Bu değişiklikler, sistemin daha sağlam çalışmasını sağladı ve Windows karakter kodlama sorunları, tensor boyut uyumsuzlukları ve PDF oluşturma sorunları gibi çeşitli hata kaynaklarını ele aldı. 

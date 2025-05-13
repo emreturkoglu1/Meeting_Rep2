@@ -1,0 +1,41 @@
+# öncelikle "python3.10 -m venv meetingenv" komutunu kullanarak bir sanal ortam oluşturun.
+# ardından sanal ortamın içine girip "pip install -r requirements.txt" komutunu kullanarak gerekli paketleri yükleyin.
+# daha sonrasında "npm install -g markdown-pdf" komutunu kullanarak markdown-pdf'i yükleyin.
+# son olarak python3 parser.py komutunu kullanarak parser.py'i çalıştırın.
+# kankam kusura bakma biraz uğraştırdım seni
+
+# Core dependencies
+python-ffmpeg==0.2.0
+requests==2.32.3
+numpy==1.26.4
+pandas==2.2.1
+
+# Audio processing
+pyannote.audio==3.1.1
+openai-whisper==20240930
+huggingface-hub==0.21.4
+torch==2.0.1
+torchaudio==2.0.2
+torchvision==0.15.2
+soundfile==0.12.1
+
+# Machine learning
+pytorch-lightning==2.0.2
+torchmetrics==0.11.4
+scipy==1.12.0
+
+# Email service
+smtplib-wrapper==1.1.9
+
+# Video processing
+opencv-python==4.8.1.78
+reportlab==4.1.0
+
+# Web interface
+markdown==3.5.2
+
+# Installation notes:
+# 1. Create a virtual environment: python -m venv meetingenv
+# 2. Activate the environment: source meetingenv/bin/activate (Linux/Mac) or meetingenv\Scripts\activate (Windows)
+# 3. Install requirements: pip install -r requirements.txt
+# 4. Install markdown-pdf globally: npm install -g markdown-pdf
