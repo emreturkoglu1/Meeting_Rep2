@@ -2,6 +2,7 @@ import requests
 import json
 import os
 import re
+from datetime import datetime
 
 API_KEY = "AIzaSyDWc6YD_9vys2xUaGAAQwnvvTRnLX_FnlQ"  # Replace with your actual API key
 
@@ -274,7 +275,7 @@ def create_fallback_report():
         emotion_section = "## Facial Expression Analysis\n\n### Emotion Distribution\n"
         for emotion, count in emotion_data.items():
             percentage = (count / total_emotions) * 100
-            emotion_section += f"- **{emotion.capitalize()}**: {percentage:.1f}%\n"
+            emotion_section += f"- {emotion.capitalize()}: {percentage:.1f}%\n"
     
     # Basit bir rapor oluştur
     fallback_report = """<style>
@@ -360,9 +361,9 @@ margin: 30px 0;
 This meeting report was automatically generated from the uploaded meeting recording. The API integration is currently having temporary issues.
 
 ## Meeting Details
-- **Date**: Auto-generated report
-- **Participants**: Extracted from audio diarization
-- **Duration**: Based on transcript timestamps
+- Date: {datetime.now().strftime('%Y-%m-%d')}
+- Number of Active Participants: Extracted from audio diarization
+- Duration: Based on transcript timestamps
 
 ## Transcript Summary
 The full transcript is available in the transcript.txt file.
@@ -425,7 +426,7 @@ if total_emotions > 0:
     emotion_distribution = "### Emotion Distribution\n"
     for emotion, count in emotion_data.items():
         percentage = (count / total_emotions) * 100
-        emotion_distribution += f"- **{emotion.capitalize()}**: {percentage:.1f}%\n"
+        emotion_distribution += f"- {emotion.capitalize()}: {percentage:.1f}%\n"
 else:
     emotion_distribution = "### Emotion Distribution\nNo emotion data available."
 
@@ -440,10 +441,10 @@ Do not include any introductory text or additional explanations.
 [Provide a concise 3-4 sentence overview of the entire meeting. Highlight the main purpose and key outcomes.]
 
 ## Meeting Details
-- **Date**: [Extract or estimate based on discussion]
-- **Duration**: [Calculate from transcript timestamps]
-- **Participants**: [List all speakers identified in the transcript]
-- **Topics Covered**: [List 3-5 main topics discussed]
+- Date: {datetime.now().strftime('%Y-%m-%d')}
+- Duration: [Calculate from transcript timestamps]
+- Number of Active Participants: [Count unique speakers from transcript]
+- Topics Covered: [List 3-5 main topics discussed]
 
 ## Key Discussion Points
 [Provide 3-5 bullet points highlighting the most important discussions]
@@ -460,9 +461,9 @@ Do not include any introductory text or additional explanations.
 ## Action Items
 | Action | Assigned To | Due Date | Priority |
 |--------|-------------|----------|----------|
-| [Action 1] | [Person] | [Date if mentioned] | [High/Medium/Low] |
-| [Action 2] | [Person] | [Date if mentioned] | [High/Medium/Low] |
-| [Action 3] | [Person] | [Date if mentioned] | [High/Medium/Low] |
+| [Action 1] | [Person] | [Date if mentioned] | [High/Medium/Low/Undefined] |
+| [Action 2] | [Person] | [Date if mentioned] | [High/Medium/Low/Undefined] |
+| [Action 3] | [Person] | [Date if mentioned] | [High/Medium/Low/Undefined] |
 
 ## Follow-up Required
 [List any topics that need to be addressed in future meetings or require additional discussion]

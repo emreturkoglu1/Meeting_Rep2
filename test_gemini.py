@@ -2,6 +2,7 @@ import os
 import geminiapi
 import requests
 import json
+from datetime import datetime
 
 # Test transcript dosyasını oluştur
 transcript = """
@@ -33,9 +34,9 @@ Do not include any introductory text or additional explanations.
 [Provide a concise 3-4 sentence overview of the entire meeting. Highlight the main purpose and key outcomes.]
 
 ## Meeting Details
-- **Date**: [Extract or estimate based on discussion]
+- **Date**: {datetime.now().strftime('%Y-%m-%d')}
 - **Duration**: [Calculate from transcript timestamps]
-- **Participants**: [List all speakers identified in the transcript]
+- **Number of Active Participants**: [Count of unique speakers from transcript but not their names]
 - **Topics Covered**: [List 3-5 main topics discussed]
 
 ## Key Discussion Points
